@@ -1,0 +1,138 @@
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+version: '2'
+
+networks:
+  fabric-ca:
+
+volumes:
+  orderer1-ordererOrg:
+  orderer2-ordererOrg:
+  orderer3-ordererOrg:
+
+services:
+  orderer1-ordererOrg:
+    container_name: orderer1-ordererOrg
+    image: hyperledger/fabric-orderer:1.4.3
+    environment:
+      - ORDERER_HOST=orderer1-ordererOrg
+      - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
+      - ORDERER_GENERAL_GENESISMETHOD=file
+      - ORDERER_GENERAL_GENESISFILE=/var/hyperledger/orderer/orderer.genesis.block
+      - ORDERER_GENERAL_LOCALMSPID=OrdererMSP
+      - ORDERER_GENERAL_LOCALMSPDIR=/var/hyperledger/orderer/msp   ## ordererCA 서버에 enroll 하면서 생성된 모든 키파일들이 담긴 경로
+      - ORDERER_GENERAL_LOGLEVEL=debug
+      - FABRIC_LOGGING_SPEC=grpc=debug:info
+      - ORDERER_DEBUG_BROADCASTTRACEDIR=data/logs
+      - ORDERER_KAFKA_RETRY_SHORTINTERVAL=1s
+      - ORDERER_KAFKA_RETRY_SHORTTOTAL=30s
+      - ORDERER_KAFKA_VERBOSE=true
+      - ORDERER_KAFKA_TOPIC_REPLICATIONFACTOR=1
+      # TLS Section
+      - ORDERER_GENERAL_TLS_ENABLED=true
+      - ORDERER_GENERAL_TLS_CERTIFICATE=/var/hyperledger/orderer/tls/server.crt  # /var/hyperledger/orderer/tls/server.crt ## TLS-CA 서버에 enroll 하면서 생성된 키파일들
+      - ORDERER_GENERAL_TLS_PRIVATEKEY=/var/hyperledger/orderer/tls/server.key  # /var/hyperledger/orderer/tls/server.key
+      - ORDERER_GENERAL_TLS_ROOTCAS=[/var/hyperledger/orderer/tls/ca.crt]  # /var/hyperledger/orderer/tls/ca.crt
+      # Raft Section
+      - ORDERER_GENERAL_CLUSTER_CLIENTCERTIFICATE=/var/hyperledger/orderer/tls/server.crt # /var/hyperledger/orderer/tls/server.crt
+      - ORDERER_GENERAL_CLUSTER_CLIENTPRIVATEKEY=/var/hyperledger/orderer/tls/server.key  # /var/hyperledger/orderer/tls/server.key
+      - ORDERER_GENERAL_CLUSTER_ROOTCAS=[/var/hyperledger/orderer/tls/ca.crt]  # /var/hyperledger/orderer/tls/ca.crt
+        #- ORDERER_GENERAL_TLS_CLIENTAUTHREQUIRED=true
+        #- ORDERER_GENERAL_TLS_CLIENTROOTCAS=[/var/hyperledger/orderer/tls/ca.crt]
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric
+    command: orderer
+    volumes:
+      - ./channel-artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
+      - /tmp/hyperledger/ordererOrg/orderer1/msp:/var/hyperledger/orderer/msp
+      - /tmp/hyperledger/ordererOrg/orderer1/tls:/var/hyperledger/orderer/tls
+      - orderer1-ordererOrg:/var/hyperledger/production/orderer
+    ports:
+      - 7050:7050
+    networks:
+      - fabric-ca
+
+  orderer2-ordererOrg:
+    container_name: orderer2-ordererOrg
+    image: hyperledger/fabric-orderer:1.4.3
+    environment:
+      - ORDERER_HOST=orderer2-ordererOrg
+      - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
+      - ORDERER_GENERAL_GENESISMETHOD=file
+      - ORDERER_GENERAL_GENESISFILE=/var/hyperledger/orderer/orderer.genesis.block
+      - ORDERER_GENERAL_LOCALMSPID=OrdererMSP
+      - ORDERER_GENERAL_LOCALMSPDIR=/var/hyperledger/orderer/msp   ## ordererCA 서버에 enroll 하면서 생성된 모든 키파일들이 담긴 경로
+      - ORDERER_GENERAL_LOGLEVEL=debug
+      - FABRIC_LOGGING_SPEC=grpc=debug:info
+      - ORDERER_DEBUG_BROADCASTTRACEDIR=data/logs
+      - ORDERER_KAFKA_RETRY_SHORTINTERVAL=1s
+      - ORDERER_KAFKA_RETRY_SHORTTOTAL=30s
+      - ORDERER_KAFKA_VERBOSE=true
+      - ORDERER_KAFKA_TOPIC_REPLICATIONFACTOR=1
+      # TLS Section
+      - ORDERER_GENERAL_TLS_ENABLED=true
+      - ORDERER_GENERAL_TLS_CERTIFICATE=/var/hyperledger/orderer/tls/server.crt  # /var/hyperledger/orderer/tls/server.crt ## TLS-CA 서버에 enroll 하면서 생성된 키파일들
+      - ORDERER_GENERAL_TLS_PRIVATEKEY=/var/hyperledger/orderer/tls/server.key  # /var/hyperledger/orderer/tls/server.key
+      - ORDERER_GENERAL_TLS_ROOTCAS=[/var/hyperledger/orderer/tls/ca.crt]  # /var/hyperledger/orderer/tls/ca.crt
+      # Raft Section
+      - ORDERER_GENERAL_CLUSTER_CLIENTCERTIFICATE=/var/hyperledger/orderer/tls/server.crt # /var/hyperledger/orderer/tls/server.crt
+      - ORDERER_GENERAL_CLUSTER_CLIENTPRIVATEKEY=/var/hyperledger/orderer/tls/server.key  # /var/hyperledger/orderer/tls/server.key
+      - ORDERER_GENERAL_CLUSTER_ROOTCAS=[/var/hyperledger/orderer/tls/ca.crt]  # /var/hyperledger/orderer/tls/ca.crt
+        #- ORDERER_GENERAL_TLS_CLIENTAUTHREQUIRED=true
+        #- ORDERER_GENERAL_TLS_CLIENTROOTCAS=[/var/hyperledger/orderer/tls/ca.crt]
+
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric
+    command: orderer
+    volumes:
+      - ./channel-artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
+      - /tmp/hyperledger/ordererOrg/orderer2/msp:/var/hyperledger/orderer/msp
+      - /tmp/hyperledger/ordererOrg/orderer2/tls:/var/hyperledger/orderer/tls
+      - orderer2-ordererOrg:/var/hyperledger/production/orderer
+    ports:
+      - 8050:7050
+    networks:
+      - fabric-ca
+
+  orderer3-ordererOrg:
+    container_name: orderer3-ordererOrg
+    image: hyperledger/fabric-orderer:1.4.3
+    environment:
+      - ORDERER_HOST=orderer3-ordererOrg
+      - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
+      - ORDERER_GENERAL_GENESISMETHOD=file
+      - ORDERER_GENERAL_GENESISFILE=/var/hyperledger/orderer/orderer.genesis.block
+      - ORDERER_GENERAL_LOCALMSPID=OrdererMSP
+      - ORDERER_GENERAL_LOCALMSPDIR=/var/hyperledger/orderer/msp   ## ordererCA 서버에 enroll 하면서 생성된 모든 키파일들이 담긴 경로
+      - ORDERER_GENERAL_LOGLEVEL=debug
+      - FABRIC_LOGGING_SPEC=grpc=debug:info
+      - ORDERER_DEBUG_BROADCASTTRACEDIR=data/logs
+      - ORDERER_KAFKA_RETRY_SHORTINTERVAL=1s
+      - ORDERER_KAFKA_RETRY_SHORTTOTAL=30s
+      - ORDERER_KAFKA_VERBOSE=true
+      - ORDERER_KAFKA_TOPIC_REPLICATIONFACTOR=1
+      # TLS Section
+      - ORDERER_GENERAL_TLS_ENABLED=true
+      - ORDERER_GENERAL_TLS_CERTIFICATE=/var/hyperledger/orderer/tls/server.crt  # /var/hyperledger/orderer/tls/server.crt ## TLS-CA 서버에 enroll 하면서 생성된 키파일들
+      - ORDERER_GENERAL_TLS_PRIVATEKEY=/var/hyperledger/orderer/tls/server.key  # /var/hyperledger/orderer/tls/server.key
+      - ORDERER_GENERAL_TLS_ROOTCAS=[/var/hyperledger/orderer/tls/ca.crt]  # /var/hyperledger/orderer/tls/ca.crt
+      # Raft Section
+      - ORDERER_GENERAL_CLUSTER_CLIENTCERTIFICATE=/var/hyperledger/orderer/tls/server.crt # /var/hyperledger/orderer/tls/server.crt
+      - ORDERER_GENERAL_CLUSTER_CLIENTPRIVATEKEY=/var/hyperledger/orderer/tls/server.key  # /var/hyperledger/orderer/tls/server.key
+      - ORDERER_GENERAL_CLUSTER_ROOTCAS=[/var/hyperledger/orderer/tls/ca.crt]  # /var/hyperledger/orderer/tls/ca.crt
+        #- ORDERER_GENERAL_TLS_CLIENTAUTHREQUIRED=true
+        #- ORDERER_GENERAL_TLS_CLIENTROOTCAS=[/var/hyperledger/orderer/tls/ca.crt]
+
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric
+    command: orderer
+    volumes:
+      - ./channel-artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
+      - /tmp/hyperledger/ordererOrg/orderer3/msp:/var/hyperledger/orderer/msp
+      - /tmp/hyperledger/ordererOrg/orderer3/tls:/var/hyperledger/orderer/tls
+      - orderer3-ordererOrg:/var/hyperledger/production/orderer
+    ports:
+      - 9050:7050
+    networks:
+      - fabric-ca
+

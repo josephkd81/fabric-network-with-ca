@@ -1,0 +1,152 @@
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+---
+Organizations:
+    - &OrdererOrg
+        Name: OrdererOrg
+        ID: OrdererMSP
+        MSPDir: /tmp/hyperledger/ordererOrg/msp
+        MSPType: bccsp
+        Policies: &OrdererOrgPolicies
+            Readers:
+                Type: Signature
+                Rule: "OR('OrdererMSP.member')"
+            Writers:
+                Type: Signature
+                Rule: "OR('OrdererMSP.member')"
+            Admins:
+                Type: Signature
+                Rule: "OR('OrdererMSP.admin')"
+        AdminPrincipal: Role.MEMBER
+
+    - &Org1
+        Name: Org1MSP
+        ID: Org1MSP
+        MSPDir: /tmp/hyperledger/org1/msp
+        MSPType: bccsp
+        Policies: &Org1Policies
+            Readers:
+                Type: Signature
+                Rule: "OR('Org1MSP.member')"
+            Writers:
+                Type: Signature
+                Rule: "OR('Org1MSP.member')"
+            Admins:
+                Type: Signature
+                Rule: "OR('Org1MSP.admin')"
+        AdminPrincipal: Role.MEMBER
+        AnchorPeers:
+            - Host: peer1-org1
+              Port: 7051
+
+    - &Org2
+        Name: Org2MSP
+        ID: Org2MSP
+        MSPDir: /tmp/hyperledger/org2/msp
+        MSPType: bccsp
+        Policies: &Org2Policies
+            Readers:
+                Type: Signature
+                Rule: "OR('Org2MSP.member')"
+            Writers:
+                Type: Signature
+                Rule: "OR('Org2MSP.member')"
+            Admins:
+                Type: Signature
+                Rule: "OR('Org2MSP.admin')"
+        AdminPrincipal: Role.MEMBER
+        AnchorPeers:
+            - Host: peer1-org2
+              Port: 9051
+
+Capabilities:
+    Channel: &ChannelCapabilities
+        V1_4_3: true
+        V1_3: false
+        V1_1: false
+    Orderer: &OrdererCapabilities
+        V1_4_2: true
+        V1_1: true
+
+Application: &ApplicationDefaults
+    Policies:
+        Readers:
+            Type: ImplicitMeta
+            Rule: "ANY Readers"
+        Writers:
+            Type: ImplicitMeta
+            Rule: "ANY Writers"
+        Admins:
+            Type: ImplicitMeta
+            Rule: "MAJORITY Admins"
+    Organizations:
+
+Orderer: &OrdererDefaults
+    OrdererType: etcdraft
+    Addresses:
+        - orderer1-ordererOrg:7050
+        - orderer2-ordererOrg:7050
+        - orderer3-ordererOrg:7050
+    BatchTimeout: 250ms
+    BatchSize:
+        MaxMessageCount: 5000
+        AbsoluteMaxBytes: 128000000
+        PreferredMaxBytes: 128000000
+    Kafka:
+        Brokers:
+            - 127.0.0.1:9092
+    EtcdRaft:
+        Consenters:
+            - Host: orderer1-ordererOrg
+              Port: 7050
+              ClientTLSCert: /tmp/hyperledger/ordererOrg/orderer1/tls/server.crt
+              ServerTLSCert: /tmp/hyperledger/ordererOrg/orderer1/tls/server.crt
+            - Host: orderer2-ordererOrg
+              Port: 7050
+              ClientTLSCert: /tmp/hyperledger/ordererOrg/orderer2/tls/server.crt
+              ServerTLSCert: /tmp/hyperledger/ordererOrg/orderer2/tls/server.crt
+            - Host: orderer3-ordererOrg
+              Port: 7050
+              ClientTLSCert: /tmp/hyperledger/ordererOrg/orderer3/tls/server.crt
+              ServerTLSCert: /tmp/hyperledger/ordererOrg/orderer3/tls/server.crt
+    Organizations:
+
+Channel: &ChannelDefaults
+    Policies:
+        Readers:
+            Type: ImplicitMeta
+            Rule: "ANY Readers"
+        Writers:
+            Type: ImplicitMeta
+            Rule: "ANY Writers"
+        Admins:
+            Type: ImplicitMeta
+            Rule: "MAJORITY Admins"
+    Capabilities:
+        <<: *ChannelCapabilities
+
+Profiles:
+    TwoOrgsOrdererGenesis:
+        <<: *ChannelDefaults
+        Orderer:
+            <<: *OrdererDefaults
+            Organizations:
+                - *OrdererOrg
+            Capabilities:
+                <<: *OrdererCapabilities
+        Consortiums:
+            SampleConsortium:
+                Organizations:
+                    - *Org1
+                    - *Org2
+
+    TwoOrgsChannel:
+        Consortium: SampleConsortium
+        <<: *ChannelDefaults
+        Application:
+            <<: *ApplicationDefaults
+            Organizations:
+                - *Org1
+                - *Org2
