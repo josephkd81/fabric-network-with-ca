@@ -19,7 +19,7 @@ services:
       - FABRIC_LOGGING_SPEC=info
       - CORE_PEER_MSPCONFIGPATH=/tmp/hyperledger/org1/peer1/msp
       - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
-      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=cademo_fabric-ca
+      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=ca-demo_fabric-ca
       - FABRIC_LOGGING_SPEC=debug
       - CORE_PEER_TLS_ENABLED=true
       - CORE_PEER_TLS_CERT_FILE=/tmp/hyperledger/org1/peer1/tls-msp/signcerts/cert.pem
@@ -35,6 +35,7 @@ services:
       #- CORE_PEER_TLS_CLIENTCERT_FILE=/tmp/hyperledger/org1/peer1/tls-msp/signcerts/cert.pem
       #- CORE_PEER_TLS_CLIENTKEY_FILE=/tmp/hyperledger/org1/peer1/tls-msp/keystore/key.pem
       - CORE_CHAINCODE_BUILDER=hyperledger/fabric-ccenv:1.4.3
+      - GODEBUG=netdns=go
     working_dir: /opt/gopath/src/github.com/hyperledger/fabric/org1/peer1
     volumes:
       - /var/run:/host/var/run
@@ -50,11 +51,11 @@ services:
       - CORE_PEER_ID=peer2-org1
       - CORE_PEER_ADDRESS=peer2-org1:8051
       - CORE_PEER_LOCALMSPID=Org1MSP
-      - FABRIC_LOGGING_SPEC=INFO
+      - FABRIC_LOGGING_SPEC=info
       - CORE_PEER_MSPCONFIGPATH=/tmp/hyperledger/org1/peer2/msp
       - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
-      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=cademo_fabric-ca
-      - FABRIC_LOGGING_SPEC=grpc=debug:info
+      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=ca-demo_fabric-ca
+      - FABRIC_LOGGING_SPEC=debug
       - CORE_PEER_TLS_ENABLED=true
       - CORE_PEER_TLS_CERT_FILE=/tmp/hyperledger/org1/peer2/tls-msp/signcerts/cert.pem
       - CORE_PEER_TLS_KEY_FILE=/tmp/hyperledger/org1/peer2/tls-msp/keystore/key.pem
@@ -63,8 +64,9 @@ services:
       - CORE_PEER_GOSSIP_ORGLEADER=false
       - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer2-org1:8051
       - CORE_PEER_GOSSIP_SKIPHANDSHAKE=true
-      - CORE_PEER_GOSSIP_BOOTSTRAP=peer1-org1:7051
-      - CORE_CHAINCODE_BUILDER=hyperledger/fabric-ccenv:2.1
+        #- CORE_PEER_GOSSIP_BOOTSTRAP=peer1-org1:7051
+      - CORE_CHAINCODE_BUILDER=hyperledger/fabric-ccenv:1.4.3
+      - GODEBUG=netdns=go
       # client TLS setting
       #- CORE_PEER_TLS_CLIENTAUTHREQUIRED=true
       #- CORE_PEER_TLS_CLIENTROOTCAS_FILES=/tmp/hyperledger/org1/peer2/tls-msp/tlscacerts/tls-0-0-0-0-7054.pem

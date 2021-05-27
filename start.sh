@@ -37,10 +37,10 @@ docker exec cli peer chaincode install -n mycc -v "1.0" -p github.com/hyperledge
 
 docker exec cli peer chaincode instantiate -o orderer1-ordererOrg:7050 -C mychannel -n mycc -v "1.0" -c '{"Args":["init","a","100","b","200"]}' --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/crypto-config/ordererOrg/msp/tlscacerts/tls-0-0-0-0-7053.pem
 
-#sleep 10
+sleep 10
 
-#docker exec cli peer chaincode invoke -o orderer1-ordererOrg:7050 -C mychannel -n mycc -c '{"Args":["invoke","a","b","10"]}' --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/crypto-config/ordererOrg/msp/tlscacerts/tls-0-0-0-0-7053.pem
+docker exec cli peer chaincode invoke -o orderer1-ordererOrg:7050 -C mychannel -n mycc -c '{"Args":["invoke","a","b","10"]}' --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/crypto-config/ordererOrg/msp/tlscacerts/tls-0-0-0-0-7053.pem
 
-#sleep 3
+sleep 3
 
-#docker exec cli peer chaincode query -C mychannel -n mycc -c '{"Args":["query","a"]}'
+docker exec cli peer chaincode query -C mychannel -n mycc -c '{"Args":["query","a"]}'
